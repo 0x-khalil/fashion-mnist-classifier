@@ -1,6 +1,6 @@
 import numpy as np
 from skimage.feature import local_binary_pattern
-
+from skimage.feature import hog
 def extract_lbp_features(images, radius=1, n_points=8):
     """
     Converts a batch of images into LBP Histogram feature vectors.
@@ -19,3 +19,16 @@ def extract_lbp_features(images, radius=1, n_points=8):
         lbp_features.append(hist)
 
     return np.array(lbp_features)
+
+def extract_hog_features(images):
+    """
+    Converts a batch of images into HOG feature vectors.
+    """
+    hog_features = []
+    for img in images:
+
+        fd = hog(img, orientations=9, pixels_per_cell=(8, 8),
+                 cells_per_block=(2, 2), visualize=False)
+        hog_features.append(fd)
+
+    return np.array(hog_features)
