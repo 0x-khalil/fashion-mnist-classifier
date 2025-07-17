@@ -31,4 +31,16 @@ def extract_hog_features(images):
                  cells_per_block=(2, 2), visualize=False)
         hog_features.append(fd)
 
+def extract_combined_features(images):
+    """
+    Extracts both LBP and HOG and stacks them into one large feature vector.
+    """
+    print("Extracting LBP...")
+    lbp_feats = extract_lbp_features(images)
+    print("Extracting HOG...")
+    hog_feats = extract_hog_features(images)
+
+    combined = np.hstack([lbp_feats, hog_feats])
+    return combined
+
     return np.array(hog_features)
