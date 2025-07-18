@@ -10,24 +10,29 @@ def run_full_comparison():
     (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
     class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
                    'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+    subset_size = 10000
+        x_train_sub, y_train_sub = x_train[:subset_size], y_train[:subset_size]
 
-    experiments = ["lbp", "hog", "combined"]
-    results = {}
+        experiments = ["lbp", "hog", "combined"]
 
-    for mode in experiments:
-        print(f"\n" + "="*40)
-        print(f"STARTING EXPERIMENT: {mode.upper()}")
-        print("="*40)
+        for mode in experiments:
+            print(f"\n" + "="*40)
+            print(f"K-FOLD VALIDATION: {mode.upper()}")
+            print("="*40)
 
-        if mode == "lbp":
-            x_train_feat = extract_lbp_features(x_train)
-            x_test_feat = extract_lbp_features(x_test)
-        elif mode == "hog":
-            x_train_feat = extract_hog_features(x_train)
-            x_test_feat = extract_hog_features(x_test)
-        else:
-            x_train_feat = extract_combined_features(x_train)
-            x_test_feat = extract_combined_features(x_test)
+            if mode == "lbp":
+                features = extract_lbp_features(x_train_sub)
+            elif mode == "hog":
+                features = extract_hog_features(x_train_sub)
+            else:
+                features = extract_combined_features(x_train_sub)
+
+            # K-Fold
+            scores = evaluate_with_kfold(features, y_train_sub, k=5)
+
+            print(f"\nResults for {mode.upper()}:")
+            print(f"Individual Fold Accuracies: {scores}")
+            print(f"Mean Accuracy: {np.mean(scores):.4f} (+/- {np.std(scores) * 2:.4f})")
 
         # train
         print(f"Training XGBoost on {x_train_feat.shape[1]} features...")
