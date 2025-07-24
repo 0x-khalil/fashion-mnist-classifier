@@ -2,14 +2,18 @@ from xgboost import XGBClassifier
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 def get_xgb_model():
     return XGBClassifier(
-        n_estimators=100,
-        max_depth=6,
-        learning_rate=0.1,
-        objective='multi:softmax',
-        num_class=10,
-        tree_method='hist',
-        random_state=42
-    )
+            n_estimators=300,
+            max_depth=8,
+            learning_rate=0.05,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            gamma=1,
+            objective='multi:softmax',
+            num_class=10,
+            tree_method='hist',
+            random_state=42,
+            device="cuda"
+        )
     def evaluate_with_kfold(X, y, k=5):
         """
         Performs Stratified K-Fold cross-validation and returns the scores.
