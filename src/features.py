@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.feature import local_binary_pattern
 from skimage.feature import hog
+from sklearn.decomposition import PCA
 def extract_lbp_features(images, radius=2, n_points=16):
     """
     Converts a batch of images into LBP Histogram feature vectors.
@@ -44,3 +45,16 @@ def extract_combined_features(images):
     return combined
 
     return np.array(hog_features)
+
+def apply_pca(train_features, test_features, variance_threshold=0.95):
+    """
+    Reduces the dimensionality of features while retaining a percentage of variance.
+    """
+    print(f"Applying PCA (retaining {variance_threshold*100}% variance)...")
+
+    pca = PCA(n_components=variance_threshold, svd_solver='full')
+    train_pca = pca.fit_transform(train_features)
+    test_pca = pca.transform(test_features)
+
+    print(f"Reduced feature count from {train_features.shape[1]} to {train_pca.shape[1]}")
+    return train_pca, test_pca

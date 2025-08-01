@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.datasets import fashion_mnist
-from src.features import extract_lbp_features, extract_hog_features, extract_combined_features
+from src.features import extract_lbp_features, extract_hog_features, extract_combined_features, apply_pca
 from src.model import get_xgb_model
 from src.utils import plot_confusion_matrix
 from sklearn.metrics import accuracy_score
@@ -53,6 +53,19 @@ def run_full_comparison():
     print("!"*40)
     for mode, score in sorted(results.items(), key=lambda item: item[1], reverse=True):
         print(f"{mode.upper()}: {score:.4f}")
+        def run_pca_experiment():
+            (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+            print("--- Extracting Combined High-Res Features ---")
+            X_train_raw = extract_combined_features(x_train)
+            X_test_raw = extract_combined_features(x_test)
 
+            X_train, X_test = apply_pca(X_train_raw, X_test_raw, variance_threshold=0.95)
+
+            print(f"--- Training XGBoost on {X_train.shape[1]} Principal Components ---")
+            model = get_xgb_model(boosted=True)
+            model.fit(X_train, y_train)
+
+            y_pred = model.predict(X_test)
+            print(f"\nAccuracy with PCA + Boosted XGBoost: {accuracy_score(y_test, y_pred):.4f}")
 if __name__ == "__main__":
     run_full_comparison()
