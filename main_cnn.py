@@ -5,6 +5,7 @@ from torchvision import datasets, transforms
 from src.cnn_pytorch import FashionCNN
 
 def train():
+
     device = torch.device("cuda")
     print(f"Using device: {device}")
 
